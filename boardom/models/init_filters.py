@@ -53,8 +53,8 @@ def param_is_initialized(module, mname, parameter, pname):
     return hasattr(parameter, 'initialized') and parameter.initialized
 
 
-def param_is_not_pretrained(module, mname, parameter, pname):
-    return (parameter is None) or (not bd.is_pretrained(parameter))
+def param_is_trainable(module, mname, parameter, pname):
+    return (parameter is not None) and bd.is_trainable(parameter)
 
 
 def param_is_not_none(module, mname, parameter, pname):

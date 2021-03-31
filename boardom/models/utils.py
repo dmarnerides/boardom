@@ -1,21 +1,17 @@
-from itertools import chain
 import torch
 from torch import nn
 import boardom as bd
 
 # About pretraining and freezing:
-# 1. We set bool flags: "bd_is_pretrained", "bd_is_frozen"
-# 2. These are attached to the module / parameter.
-#    > If they don't exist it means that they are False
-#    > WARNING!! Does not mean that the initializer/optimizer/algorithm automatically ignores them
+# 1. We set bool flag "bd_is_frozen"
+# 2. It is attached to the module / parameter.
+#    > If it doesn't exist it means that it is False
+#    > WARNING!! Does not mean that the initializer/optimizer/algorithm automatically ignores it
 # 3. If applied to module, then all the children modules / parameters (recursively)
 #    will also inherit the flag
-# 4. "bd_is_pretrained":
-#    > Signifies that the parameters were pretrained.
-# 5. "bd_is_frozen":
+# 4. "bd_is_frozen":
 #    > Signifies that the parameters should be frozen during training.
 
-BD_PRETRAINED_ATTR = 'bd_is_pretrained'
 BD_FROZEN_ATTR = 'bd_is_frozen'
 
 
@@ -31,80 +27,36 @@ def _check(x, attr):
         )
 
 
-def is_pretrained(module_or_param):
-    return _check(module_or_param, BD_PRETRAINED_ATTR)
-
-
 def is_frozen(module_or_param):
     return _check(module_or_param, BD_FROZEN_ATTR)
 
 
 def is_trainable(module_or_param):
-    return not (is_frozen(module_or_param) or is_pretrained(module_or_param))
-
-
-def _set(x, value, attr):
-    setattr(x, attr, value)
-    if isinstance(x, nn.Module):
-        for name, m in x.named_modules():
-            if name:
-                bd.log(f'Setting {name} to pretrained={value}.')
-            else:
-                bd.log('Setting module to pretrained={value}.')
-            setattr(m, attr, value)
-        for name, p in x.named_parameters():
-            bd.log(f'Setting {name} requires_grad={value}.')
-            setattr(p, attr, value)
-            p.requires_grad_(value)
-    else:
-        x.requires_grad_(value)
-
-
-def set_pretrained(module_or_param, value=True):
-    if not isinstance(value, bool):
-        raise RuntimeError(
-            f'set_pretrained expected value to be bool, got: {type(value)}'
-        )
-    _set(module_or_param, value, BD_PRETRAINED_ATTR)
+    return not is_frozen(module_or_param)
 
 
 def set_frozen(module_or_param, value=True):
     if not isinstance(value, bool):
         raise RuntimeError(f'set_frozen expected value to be bool, got: {type(value)}')
-    _set(module_or_param, value, BD_FROZEN_ATTR)
+    setattr(module_or_param, BD_FROZEN_ATTR, value)
+    if isinstance(module_or_param, nn.Module):
+        for name, m in module_or_param.named_modules():
+            if name:
+                bd.log(f'Setting {name} to frozen={value}.')
+            else:
+                bd.log('Setting module to frozen={value}.')
+            setattr(m, BD_FROZEN_ATTR, value)
+        for name, p in module_or_param.named_parameters():
+            bd.log(f'Setting {name} requires_grad={value}.')
+            setattr(p, BD_FROZEN_ATTR, value)
+            p.requires_grad_(value)
+    else:
+        module_or_param.requires_grad_(value)
 
 
 def _check_is_module(x, fname):
     if not isinstance(x, nn.Module):
         raise RuntimeError(f'{fname} expected and nn.Module but got: {type(x)}')
-
-
-def pretrained_parameters(module):
-    _check_is_module(module, 'pretrained_parameters')
-    for p in module.parameters():
-        if is_pretrained(p):
-            yield p
-
-
-def named_pretrained_parameters(module):
-    _check_is_module(module, 'named_pretrained_parameters')
-    for name, p in module.named_parameters():
-        if is_pretrained(p):
-            yield name, p
-
-
-def pretrained_modules(module):
-    _check_is_module(module, 'pretrained_modules')
-    for m in module.modules():
-        if is_pretrained(m):
-            yield m
-
-
-def named_pretrained_modules(module):
-    _check_is_module(module, 'named_pretrained_modules')
-    for name, m in module.named_modules():
-        if is_pretrained(m):
-            yield name, m
 
 
 def frozen_parameters(module):
@@ -135,26 +87,26 @@ def named_frozen_modules(module):
             yield name, m
 
 
-# Returns non pretrained, non frozen parameters
+# Returns non frozen parameters
 def trainable_parameters(module):
     _check_is_module(module, 'trainable_parameters')
     for p in module.parameters():
-        if (not is_frozen(p)) and (not is_pretrained(p)):
+        if not is_frozen(p):
             yield p
 
 
-# Returns non pretrained, non frozen parameters
+# Returns non frozen parameters
 def named_trainable_parameters(module):
     _check_is_module(module, 'named_trainable_parameters')
     for name, p in module.named_parameters():
-        if (not is_frozen(p)) and (not is_pretrained(p)):
+        if not is_frozen(p):
             yield name, p
 
 
-# Trainable is the ones that are not pretrained or frozen
+# Trainable is the ones that are not frozen
 def count_parameters(net, trainable=False):
     """Counts the parameters of a given PyTorch model."""
-    params = bd.trainable_parameters(net) if trainable else net.parameters()
+    params = trainable_parameters(net) if trainable else net.parameters()
     return sum(p.numel() for p in params)
 
 
