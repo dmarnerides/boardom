@@ -2,15 +2,14 @@ import torch
 from torch import nn
 import boardom as bd
 
-# About pretraining and freezing:
+# About freezing:
 # 1. We set bool flag "bd_is_frozen"
 # 2. It is attached to the module / parameter.
 #    > If it doesn't exist it means that it is False
 #    > WARNING!! Does not mean that the initializer/optimizer/algorithm automatically ignores it
+#       It just signifies that the parameters should be frozen during training.
 # 3. If applied to module, then all the children modules / parameters (recursively)
 #    will also inherit the flag
-# 4. "bd_is_frozen":
-#    > Signifies that the parameters should be frozen during training.
 
 
 def _check(x, attr):
@@ -47,7 +46,7 @@ def freeze(module_or_param, value=True):
             else:
                 bd.log(f'Setting module to frozen={value}.')
             setattr(m, 'is_frozen', value)
-            for name, p in module_or_param.named_parameters(recurse=False):
+            for name, p in m.named_parameters(recurse=False):
                 setattr(p, 'is_frozen', value)
                 bd.log(f'Setting {name} requires_grad={not value}.')
                 p.requires_grad_(not value)

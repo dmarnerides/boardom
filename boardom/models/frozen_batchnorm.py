@@ -55,7 +55,7 @@ class BatchNormFreezer:
         )
 
     def extra_repr(self):
-        return self._old_extra_repr() + ' --Frozen-- '
+        return self._old_extra_repr() + ' --Frozen Running Stats-- '
 
 
 def freeze_bn_running_stats(model):

@@ -56,7 +56,7 @@ from .init_filters import (
     param_is_bias,
     param_is_initialized,
     param_is_not_none,
-    param_is_trainable,
+    param_is_not_frozen,
     param_is_weight,
 )
 

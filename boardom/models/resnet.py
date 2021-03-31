@@ -52,7 +52,7 @@ def forward_no_relu_bottleneck(self, x):
 def pretrained_resnet_layers(
     network_name,
     num_pretrained_layers=6,
-    freeze_batchnorm=True,
+    freeze_bn_running_stats=False,
     split_before_relus=False,
 ):
     if (num_pretrained_layers < 0) or (num_pretrained_layers > 6):
@@ -78,9 +78,9 @@ def pretrained_resnet_layers(
             break
         for mod in module_list:
             bd.set_pretrained(mod)
-            if freeze_batchnorm:
+            if freeze_bn_running_stats:
                 bd.log('Freezing batchnorm for module {name}.')
-                bd.freeze_batchnorm(mod)
+                bd.freeze_bn_running_stats(mod)
     if split_before_relus:
         for m in [model.layer1, model.layer2, model.layer3, model.layer4]:
             block = m[-1]
@@ -126,12 +126,12 @@ class PretrainedResnet(Module):
         network_name,
         num_classes=1000,
         num_pretrained_layers=5,
-        freeze_batchnorm=True,
+        freeze_bn_running_stats=False,
         final_activation=None,
     ):
         super().__init__()
         module_list = pretrained_resnet_layers(
-            network_name, num_pretrained_layers, freeze_batchnorm
+            network_name, num_pretrained_layers, freeze_bn_running_stats
         )
         if num_classes != 1000:
             module_list[-1][-1] = nn.Linear(
