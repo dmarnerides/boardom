@@ -34,8 +34,8 @@ from .gaussian import gaussian_kernel_nd, gaussian_blur2d, GaussianBlur2d
 from .psnr import psnr, PSNR
 
 from .frozen_batchnorm import (
-    freeze_batchnorm,
-    unfreeze_batchnorm,
+    freeze_bn_running_stats,
+    unfreeze_bn_running_stats,
 )
 
 from .box_filter import box_filter1d, box_filter2d, box_filternd
@@ -56,7 +56,7 @@ from .init_filters import (
     param_is_bias,
     param_is_initialized,
     param_is_not_none,
-    param_is_not_pretrained,
+    param_is_not_frozen,
     param_is_weight,
 )
 
@@ -98,15 +98,9 @@ from .perceptual_loss import StyleLoss, FeatureLoss, PerceptualLoss, FeatureMatc
 from .interp1d import PiecewiseMLP, Interp1d
 
 from .utils import (
-    is_pretrained,
     is_frozen,
     is_trainable,
-    set_pretrained,
-    set_frozen,
-    pretrained_parameters,
-    named_pretrained_parameters,
-    pretrained_modules,
-    named_pretrained_modules,
+    freeze,
     frozen_parameters,
     named_frozen_parameters,
     frozen_modules,
