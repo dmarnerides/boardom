@@ -34,8 +34,8 @@ from .gaussian import gaussian_kernel_nd, gaussian_blur2d, GaussianBlur2d
 from .psnr import psnr, PSNR
 
 from .frozen_batchnorm import (
-    freeze_batchnorm,
-    unfreeze_batchnorm,
+    freeze_bn_running_stats,
+    unfreeze_bn_running_stats,
 )
 
 from .box_filter import box_filter1d, box_filter2d, box_filternd
@@ -100,7 +100,7 @@ from .interp1d import PiecewiseMLP, Interp1d
 from .utils import (
     is_frozen,
     is_trainable,
-    set_frozen,
+    freeze,
     frozen_parameters,
     named_frozen_parameters,
     frozen_modules,

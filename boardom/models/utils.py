@@ -12,8 +12,6 @@ import boardom as bd
 # 4. "bd_is_frozen":
 #    > Signifies that the parameters should be frozen during training.
 
-BD_FROZEN_ATTR = 'bd_is_frozen'
-
 
 def _check(x, attr):
     if isinstance(x, (nn.Module, nn.Parameter)):
@@ -28,30 +26,36 @@ def _check(x, attr):
 
 
 def is_frozen(module_or_param):
-    return _check(module_or_param, BD_FROZEN_ATTR)
+    return _check(module_or_param, 'is_frozen')
 
 
 def is_trainable(module_or_param):
     return not is_frozen(module_or_param)
 
 
-def set_frozen(module_or_param, value=True):
+BN_MODULES = (nn.BatchNorm1d, nn.BatchNorm2d, nn.BatchNorm3d)
+
+
+def freeze(module_or_param, value=True):
     if not isinstance(value, bool):
-        raise RuntimeError(f'set_frozen expected value to be bool, got: {type(value)}')
-    setattr(module_or_param, BD_FROZEN_ATTR, value)
+        raise RuntimeError(f'bd.freeze expected value to be bool, got: {type(value)}')
+
     if isinstance(module_or_param, nn.Module):
         for name, m in module_or_param.named_modules():
             if name:
                 bd.log(f'Setting {name} to frozen={value}.')
             else:
-                bd.log('Setting module to frozen={value}.')
-            setattr(m, BD_FROZEN_ATTR, value)
-        for name, p in module_or_param.named_parameters():
-            bd.log(f'Setting {name} requires_grad={value}.')
-            setattr(p, BD_FROZEN_ATTR, value)
-            p.requires_grad_(value)
+                bd.log(f'Setting module to frozen={value}.')
+            setattr(m, 'is_frozen', value)
+            for name, p in module_or_param.named_parameters(recurse=False):
+                setattr(p, 'is_frozen', value)
+                bd.log(f'Setting {name} requires_grad={not value}.')
+                p.requires_grad_(not value)
     else:
-        module_or_param.requires_grad_(value)
+        bd.log(f'Setting {name} requires_grad={not value}.')
+        module_or_param.requires_grad_(not value)
+
+    return module_or_param
 
 
 def _check_is_module(x, fname):
