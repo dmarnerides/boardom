@@ -133,6 +133,10 @@ class Checkpoint(bd.Engine):
             save_state_dicts=cfg.save_state_dicts,
             sanitize_metadata=sanitize_metadata,
         )
+        # Rebase the directory from metadata in case it is accessed
+        # from a different mount point
+        for val in self.checkpointing.metadata.values():
+            val.directory = directory
 
     def save_checkpoint(
         self,
@@ -152,7 +156,9 @@ class Checkpoint(bd.Engine):
                 force_no_overwrite=force_no_overwrite,
             )
 
-    def load_latest(self, *keys, exclude=None, load_fn=torch.load, **kwargs):
+    def load_latest(
+        self, *keys, exclude=None, load_fn=torch.load, strict=True, **kwargs
+    ):
         chkp = self.checkpointing
         chkp_num = chkp.previous_checkpoint_num
         if chkp_num == 0:
@@ -173,17 +179,17 @@ class Checkpoint(bd.Engine):
             latest = val.files[current_key]
             basename = latest.basename
             full_name = os.path.join(directory, basename)
-            loaded = load_fn(full_name)
-            _set_state(self, state_key, loaded, val.save_state_dicts, **kwargs)
+            loaded = load_fn(full_name, **kwargs)
+            _set_state(self, state_key, loaded, val.save_state_dicts, strict=strict)
             bd.log(f'Loaded {state_key} checkpoint: {basename}')
 
 
-def _set_state(self, state_key, loaded, save_state_dicts, **kwargs):
+def _set_state(self, state_key, loaded, save_state_dicts, strict=True):
     obj = self.get(state_key, bd.Null)
     if obj is bd.Null:
         self[state_key] = loaded
     elif save_state_dicts and hasattr(obj, 'load_state_dict'):
-        obj.load_state_dict(loaded, **kwargs)
+        obj.load_state_dict(loaded, strict=strict)
     elif (
         save_state_dicts
         and (not hasattr(obj, 'load_state_dict'))
@@ -192,7 +198,7 @@ def _set_state(self, state_key, loaded, save_state_dicts, **kwargs):
     ):
         for subkey, subloaded in loaded.items():
             new_key = f'{state_key}.{subkey}'
-            _set_state(self, new_key, subloaded, save_state_dicts, **kwargs)
+            _set_state(self, new_key, subloaded, save_state_dicts, strict=strict)
         pass
     else:
         self[state_key] = loaded
