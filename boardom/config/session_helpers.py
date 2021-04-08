@@ -114,17 +114,17 @@ def _create_session(cfg, session_name=None):
     if autohash is not None:
         pid_fname += f'.{autohash}'
 
-    process_dir = bd.make_dir(os.path.join(boardom_path, 'processes'))
-    process_id_file = os.path.join(process_dir, pid_fname)
-
-    if os.path.exists(process_id_file):
-        raise RuntimeError(
-            'Process File Already Exists?!? That is unlucky. Please run again..'
-            f'\n id: {process_id_file}'
-        )
-    else:
-        with open(process_id_file, 'w') as f:
-            f.write('42')
+    #  process_dir = bd.make_dir(os.path.join(boardom_path, 'processes'))
+    #  process_id_file = os.path.join(process_dir, pid_fname)
+    #
+    #  if os.path.exists(process_id_file):
+    #      raise RuntimeError(
+    #          'Process File Already Exists?!? That is unlucky. Please run again..'
+    #          f'\n id: {process_id_file}'
+    #      )
+    #  else:
+    #      with open(process_id_file, 'w') as f:
+    #          f.write('42')
     if _get(cfg, 'print_cfg'):
         bd.write('-' * 80)
         bd.write(cfg)
