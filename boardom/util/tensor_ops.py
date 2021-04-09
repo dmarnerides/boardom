@@ -153,7 +153,12 @@ def exponential_size(val):
 
 # Accepts hwc-bgr image
 def index_gauss(
-    img, precision=None, crop_size=None, random_size=True, ratio=None, seed=None,
+    img,
+    precision=None,
+    crop_size=None,
+    random_size=True,
+    ratio=None,
+    seed=None,
 ):
     """Returns indices (Numpy slice) of an image crop sampled spatially using a gaussian distribution.
 
@@ -226,7 +231,12 @@ def index_gauss(
 
 
 def slice_gauss(
-    img, precision=None, crop_size=None, random_size=True, ratio=None, seed=None,
+    img,
+    precision=None,
+    crop_size=None,
+    random_size=True,
+    ratio=None,
+    seed=None,
 ):
     """Returns a cropped sample from an image array using :func:`index_gauss`"""
     return img[index_gauss(img, precision, crop_size, random_size, ratio)]
@@ -574,7 +584,12 @@ def _make_tensor_4d_with_3_channels(x, orig_view):
 
 
 def make_grid(
-    images, view=None, size=None, inter_pad=0, fill_value=0, scale_each=False,
+    images,
+    view=None,
+    size=None,
+    inter_pad=0,
+    fill_value=0,
+    scale_each=False,
 ):
     """Creates a single image grid from a set of images.
 

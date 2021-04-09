@@ -1,4 +1,5 @@
 import os
+from inspect import signature
 from collections.abc import Mapping
 import json
 import torch
@@ -189,7 +190,12 @@ def _set_state(self, state_key, loaded, save_state_dicts, strict=True):
     if obj is bd.Null:
         self[state_key] = loaded
     elif save_state_dicts and hasattr(obj, 'load_state_dict'):
-        obj.load_state_dict(loaded, strict=strict)
+        load_state_dict = obj.load_state_dict
+        sig = signature(load_state_dict)
+        if 'strict' in sig.parameters:
+            load_state_dict(loaded, strict=strict)
+        else:
+            load_state_dict(loaded)
     elif (
         save_state_dicts
         and (not hasattr(obj, 'load_state_dict'))
