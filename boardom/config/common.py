@@ -125,6 +125,8 @@ DATALOADER_KEYS = [
     'pin_memory',
     'drop_last',
     'timeout',
+    'prefetch_factor',
+    'persistent_workers',
 ]
 CHECKPOINT_KEYS = ['overwrite', 'strict', 'use_timestamps']
 IMAGE_SAMPLER_KEYS = ['overwrite', 'use_timestamps', 'extension']
@@ -348,6 +350,8 @@ EXTRA_SETTINGS = [
         default=0,
         help='Timeout for data loader.',
     ),
+    dict(flag='--prefetch_factor', type=int, default=2),
+    dict(flag='--persistent_workers', type=str2bool, default=False),
     dict(flag='--overwrite', type=str2bool, default=True),
     dict(flag='--strict', type=str2bool, default=True),
     dict(flag='--use_timestamps', type=str2bool, default=True),

@@ -73,47 +73,44 @@ def torchvision_dataset(
     return ret_dataset
 
 
-@bd.autoconfig(ignore=['dataset', 'preprocess', 'worker_init_fn', 'collate_fn'])
+@bd.autoconfig(
+    ignore=[
+        'dataset',
+        'preprocess',
+        'worker_init_fn',
+        'collate_fn',
+        'sampler',
+        'batch_sampler',
+    ]
+)
 def loader(
     dataset,
     batch_size=1,
-    num_workers=0,
     shuffle=True,
+    sampler=None,
+    batch_sampler=None,
+    num_workers=0,
+    collate_fn=None,
     pin_memory=False,
     drop_last=False,
-    worker_init_fn=None,
-    collate_fn=None,
     timeout=0,
+    worker_init_fn=None,
+    prefetch_factor=2,
+    persistent_workers=False,
     preprocess=None,
 ):
-    """Creates a torch DataLoader using the dataset, configured using Command Line Arguments.
-
-    Args:
-        dataset (Dataset): A torch compatible dataset.
-        preprocess (callable, optional): A function that takes a single data
-            point from the dataset to preprocess on the fly (default None).
-        subset (string, optional): Specifies the subset of the relevant
-            categories, if any of them was split (default, None).
-
-    Relevant Command Line Arguments:
-
-        - **dataloader**: `--batch_size`, `--num_workers`, `--pin_memory`,
-          `--shuffle`, `--drop_last`.
-
-    Note:
-        Settings are automatically acquired from a call to :func:`boardom.config.parse`
-        from the built-in ones. If :func:`boardom.config.parse` was not called in the
-        main script, this function will call it.
-
-    """
     kwargs = {
         'batch_size': batch_size,
+        'shuffle': shuffle,
+        'sampler': sampler,
+        'batch_sampler': batch_sampler,
         'num_workers': num_workers,
         'pin_memory': pin_memory,
-        'shuffle': shuffle,
         'drop_last': drop_last,
-        'worker_init_fn': worker_init_fn,
         'timeout': timeout,
+        'worker_init_fn': worker_init_fn,
+        'prefetch_factor': prefetch_factor,
+        'persistent_workers': persistent_workers,
     }
     collate_fn = collate_fn or default_collate
     if preprocess is not None:
