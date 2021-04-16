@@ -277,9 +277,9 @@ def _save(self, state_keys, extra_meta, tag, save_fn, force_no_overwrite):
         to_save = _get_state(
             self[state_key], save_state_dicts=metadata.save_state_dicts
         )
-        tag = f'.{str(tag)}' if tag else ''
+        new_tag = f'.{str(tag)}' if tag else ''
         str_timestamp = f'.{timestamp}' if metadata.use_timestamps else ''
-        basename = f'{state_key}{str_timestamp}{tag}{chkp.extension}'
+        basename = f'{state_key}{str_timestamp}{new_tag}{chkp.extension}'
         # if not overwriting, make sure that we give a new name to the file
         # (incase it already exists)
         if not overwrite:
