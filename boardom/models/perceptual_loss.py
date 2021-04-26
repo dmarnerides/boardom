@@ -215,7 +215,11 @@ class PerceptualLoss(Module):
 #  # when training GANS
 class FeatureMatchingLoss(Module):
     def __init__(
-        self, mode='l2', reduction='mean', aggregate_scales=True, use_gram_matrix=False,
+        self,
+        mode='l2',
+        reduction='mean',
+        aggregate_scales=True,
+        use_gram_matrix=False,
     ):
         super().__init__()
         _check_params('gatys', mode, reduction)
