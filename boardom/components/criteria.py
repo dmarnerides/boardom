@@ -54,13 +54,13 @@ class Criteria(bd.Engine):
         bd.log('Building criteria from cfg')
         ret = bd.State({'weights': {}})
         w_strs, mod_strs = [], []
-        module_kwargs = {k.lowercase(): v for k, v in module_kwargs.items()}
+        module_kwargs = {k.lower(): v for k, v in module_kwargs.items()}
         for name in cfg.criteria:
             kwargs = {}
             if 'all' in module_kwargs:
                 kwargs.update(module_kwargs['all'])
-            if name.lowercase() in module_kwargs:
-                kwargs.update(module_kwargs[name.lowercase()])
+            if name.lower() in module_kwargs:
+                kwargs.update(module_kwargs[name.lower()])
             module = bd.magic_module([name, {'kwargs': kwargs}])
             with cfg.group_fallback():
                 weight = cfg.g[name].get('criterion_weight')
