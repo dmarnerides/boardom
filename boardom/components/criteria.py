@@ -40,7 +40,13 @@ class Criteria(bd.Engine):
             else:
                 self.criteria.main = crits
 
-    def create_criteria_from_cfg(self, cfg=None):
+    # module_kwarg keys should be the name of the criterion
+    # the values should be a dict containing the arguments for the criterion
+    # e.g. self.create_criteria_from_cfg(perceptualloss={'reduction': 'mean'})
+    # if all is in module_kwargs, that is applied firs (and updated from more specific)
+    # e.g. self.create_criteria_from_cfg(all={'reduction': 'none'}, perceptualloss={'reduction': 'mean'})
+    #      This will gice 'none' to all criteria for reduction but 'mean' for perceptualloss
+    def create_criteria_from_cfg(self, cfg=None, **module_kwargs):
         cfg = _prepare_cfg(cfg, CRITERIA_KEYS)
         if not cfg.criteria:
             return
@@ -48,8 +54,14 @@ class Criteria(bd.Engine):
         bd.log('Building criteria from cfg')
         ret = bd.State({'weights': {}})
         w_strs, mod_strs = [], []
+        module_kwargs = {k.lowercase(): v for k, v in module_kwargs.items()}
         for name in cfg.criteria:
-            module = bd.magic_module([name])
+            kwargs = {}
+            if 'all' in module_kwargs:
+                kwargs.update(module_kwargs['all'])
+            if name.lowercase() in module_kwargs:
+                kwargs.update(module_kwargs[name.lowercase()])
+            module = bd.magic_module([name, {'kwargs': kwargs}])
             with cfg.group_fallback():
                 weight = cfg.g[name].get('criterion_weight')
             mod_strs.append(f'\t{module}')
