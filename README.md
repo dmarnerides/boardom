@@ -1,6 +1,6 @@
 # Boardom
 
-High-ish level toolbox, less boilerplate, PyTorch, loops, code, metrics, blah blah, deep learning, blah.
+High-ish level toolbox, less boilerplate, PyTorch, training/evaluation loops, metrics etc..
 
 A continuation of [pydlt](https://github.com/dmarnerides/pydlt). 
 
