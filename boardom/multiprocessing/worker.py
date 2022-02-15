@@ -2,7 +2,7 @@
 # TODO: ADD COPYRIGHT AND LINK
 
 import torch
-from torch._six import queue
+import queue
 from torch._utils import ExceptionWrapper
 from torch.utils.data._utils import (
     signal_handling,

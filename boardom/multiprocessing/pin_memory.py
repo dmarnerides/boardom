@@ -3,7 +3,9 @@
 
 import asyncio
 import torch
-from torch._six import queue, container_abcs, string_classes
+import queue
+from collections import abc as container_abcs
+from torch._six import string_classes
 from torch.utils.data._utils import MP_STATUS_CHECK_INTERVAL
 from torch._utils import ExceptionWrapper
 

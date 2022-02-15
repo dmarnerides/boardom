@@ -10,7 +10,8 @@ import torch.multiprocessing as multiprocessing
 from torch._utils import ExceptionWrapper
 from torch.utils.data import _utils as torch_data_utils
 from torch.utils.data._utils import signal_handling
-from torch._six import queue, string_classes
+import queue
+from torch._six import string_classes
 from .pin_memory import _pin_memory_loop
 from .worker import _worker_loop
 
